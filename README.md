@@ -6,7 +6,7 @@
 
 1. **저장소 복제 (clone)**
    ```bash
-   git clone https://github.com/UMC-ERICA/8th-Web.git
+   git clone https://github.com/UMC-ERICA/9th-Web.git
    ```
 2. 본인 브랜치로 이동
 
