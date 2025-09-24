@@ -1,0 +1,94 @@
+* {
+    box-sizing: border-box; /* 패딩과 보더까지 포함해서 너비 계산 */
+    margin: 0;              /* 기본 여백 제거 */
+    padding: 0;             /* 기본 패딩 제거 */
+    font-family: sans-serif; /* 글꼴 설정 */
+}
+
+
+body {
+    display: flex;              /* 자식 요소들을 플렉스 박스로 배치 */
+    flex-direction: column;     /* 세로 방향으로 쌓기 */
+    align-items: center;        /* 화면 가로 중앙 정렬 */
+    padding: 50px;              /* body 안쪽 여백 */
+    background-color: #f0f0f0;  /* 배경색 설정 */
+}
+
+/* 제목 꾸미기 및 여백 주기*/
+h1 {
+    margin-top: 50px;
+    margin-bottom: 50px; /* 아래쪽 여백 */
+    
+}
+/*박스 제목 가운데 정렬*/
+.todo-box h2, .completed-box h2 {
+    text-align: center;      /* 글자 가운데 정렬 */
+    margin-bottom: 20px;     /* 제목과 목록 사이 여백 */
+}
+
+/* 수평선 */
+
+hr{
+   background-color: #6a5acd;  
+    width: 90%;
+}
+
+
+/* todo-input 박스 꾸미기*/
+#todo-input {
+    width: 800px;               /* 가로 길이 */
+    padding: 10px;              /* 안쪽 여백 */
+    font-size: 16px;            /* 글자 크기 */
+    margin-top: 30px;
+    margin-bottom: 20px;        /* 아래 여백 */
+    border: 1px solid #ccc;     /* 테두리 색과 굵기 */
+}
+
+ul {
+    list-style: none;           /* 기본 점 제거 */
+    width: 300px;               /* 가로 길이 */
+    margin-bottom: 20px;        /* 아래 여백 */
+    padding: 0;                 /* 안쪽 여백 제거 */
+}
+
+.lists-container {
+    display: flex;           /* 가로로 박스 배치 */
+    gap: 50px;               /* 두 박스 사이 간격 */
+    justify-content: center; /* 화면 가운데 정렬 */
+    margin-top: 30px;
+}
+
+
+.todo-box, .completed-box {
+    width: 300px;            /* 각 박스 너비 */
+}
+
+
+li {
+    display: flex;
+    justify-content: space-between; /* 텍스트와 버튼 양쪽 배치 */
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color:#f0f0f0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* 6. 버튼 스타일 (완료 / 삭제 버튼) */
+button {
+    padding: 5px 10px;   /* 버튼 안쪽 여백 */
+    border: none;        /* 테두리 제거 */
+    border-radius: 3px;  /* 모서리 둥글게 */
+    cursor: pointer;     /* 마우스 올리면 포인터로 */
+}
+
+/* 완료 버튼 색상 */
+button.complete-btn {
+    background-color: #79b5f9;
+}
+
+/* 삭제 버튼 색상 */
+button.delete-btn {
+    background-color: #79b5f9; 
+}
