@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --darkMode: "class";
+
+  --content: [ "./index.html", "./src/**/*.{js,ts,jsx,tsx}", ];
+}
+
+@layer base {
+  body {
+    font-family: "Pretendard", "Arial", sans-serif;
+
+    @apply flex min-h-screen items-center justify-center;
+    @apply bg-neutral-100 text-black;
+    @apply dark:bg-neutral-900 dark:text-white;
+  }
+}
