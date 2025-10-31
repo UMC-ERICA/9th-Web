@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Movie } from "../types/movie";
+import { Movie, MovieResponse } from "../types/movie";
 import MovieCard from "../components/MovieCard";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { useParams } from "react-router-dom";
@@ -24,7 +24,7 @@ export default function MoviePage() : Element {
             
             try {
                 const {data} = await axios.get<MovieResponse>(
-                `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=${page}`,
+                `${import.meta.env.VITE_TMDB_API_BASE_URL}movie/${category}?language=${import.meta.env.VITE_TMDB_API_LANG}&page=${page}`,
                 {
                     headers: {
                         Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
