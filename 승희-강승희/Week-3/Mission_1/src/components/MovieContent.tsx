@@ -8,7 +8,7 @@ interface MovieContentProps {
 
 export default function MovieContent({ movie, movieCredit }: MovieContentProps) {
     // 출연진 프로필 이미지 클래스 (원형, 크기)
-    const profileImageClass = "w-24 h-24 rounded-full object-cover shadow-md"; 
+    const profileImageClass = "w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"; 
 
     // 배경 이미지 경로 (w1280 또는 original 사용)
     const backdropUrl = movie.backdrop_path

@@ -19,7 +19,7 @@ export default function MovieCard({ movie }: MovieCardProps): Element {
             onMouseLeave={() => setIsHovered(false)}
         >
             <img
-            src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+            src={`${import.meta.env.VITE_TMDB_IMAGE_URL}w200${movie.poster_path}`}
             alt={`${movie.title} 영화의 이미지`}
             className=""
             />

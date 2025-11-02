@@ -1,68 +1,30 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import axios from "axios";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import { MovieInfo } from "../types/movieinfo";
 import MovieContent from "../components/MovieContent";
 import { MovieCredit } from "../types/moviecredit";
+import useCustomFetch from "../hook/useCustomFetch";
 
 export default function MovieDetailPage() {
-  const [movieInfo , setMovieInfo] = useState<MovieInfo | null>(null);
-  const [movieCredit , setMovieCredit] = useState<MovieCredit | null>(null);
-  //1. 로딩 상태
-  const [isPending, setIsPending] = useState(false);
-  //2. 오류 상태
-  const [isError, setIsError] = useState(false);
+  const params = useParams();
 
-  const movieId = useParams<{category: string; id: string;}>();
+  const movieInfoUrl = `${import.meta.env.VITE_TMDB_API_BASE_URL}movie/${params.movieId}`;
+  const { 
+    data: movieInfo, 
+    isPending: isMovieInfoPending, 
+    isError: isMovieInfoError 
+  } = useCustomFetch<MovieInfo>(movieInfoUrl, 'ko-KR');
 
-  useEffect(() : void => {
-    const fetchMovies = async () :Promise<void>=> {
-      setIsPending(true);
-      
-      try {
-        const { data } = await axios.get<MovieInfo>(
-          `https://api.themoviedb.org/3/movie/${movieId.id}?language=${import.meta.env.VITE_TMDB_API_LANG}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-            },
-          }
-        );
-        setMovieInfo(data);
-      }catch{
-        setIsError(true);
-      }finally{
-        setIsPending(false);
-      }
-    };
+  const movieCreditUrl = `${import.meta.env.VITE_TMDB_API_BASE_URL}movie/${params.movieId}/credits`;
+  const { 
+    data: movieCredit, 
+    isPending: isMovieCreditPending, 
+    isError: isMovieCreditError 
+  } = useCustomFetch<MovieCredit>(movieCreditUrl, 'ko-KR');
 
-    fetchMovies();
-  }, [movieId.id]);
-
-  useEffect(() : void => {
-    const fetchMovies = async () :Promise<void>=> {
-      setIsPending(true);
-      
-      try{
-        const {data}= await axios.get<MovieCredit>(
-          `https://api.themoviedb.org/3/movie/${movieId.id}/credits?language=${import.meta.env.VITE_TMDB_API_LANG}` ,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`
-            },
-          }
-        );
-        setMovieCredit(data);
-      }catch{
-        setIsError(true);
-      }finally{
-        setIsPending(false);
-      }
-    };
-
-    fetchMovies();
-  }, [movieId.id]);
+  // 전체 로딩 상태와 에러 상태를 통합
+  const isPending = isMovieInfoPending || isMovieCreditPending;
+  const isError = isMovieInfoError || isMovieCreditError;
 
   if (isError) {
     return (
