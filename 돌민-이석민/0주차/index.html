@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <title>투두리스트 구현하기</title>
+
+</head>
+<body>
+  <div class="todo-container">
+    <h1>나의 투두리스트</h1>
+    <form id="todo-form">
+      <input type="text"
+      id="todo-input"
+      placeholder="할 일을 입력하세요"
+      required
+      >
+      <button type="submit" id="submit-button">추가</button>
+    </form>
+
+    <div class="lists">
+      <section>
+        <h2>해야할 일</h2>
+          <ul id="todo-list"></ul>
+      </section>
+
+      <section>
+        <h2>완료한 일</h2>
+          <ul id="done-list"></ul>
+      </section>
+    </div>
+  </div>  
+  <script src="script.js"></script>
+</body>
+</html>
