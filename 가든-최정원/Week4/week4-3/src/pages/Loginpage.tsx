@@ -1,75 +1,119 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "../hooks/useForem";
+import { api } from "../lib/api";
 
-const Loginpage = () => {
+export default function Loginpage() {
   const navigate = useNavigate();
-  const { values, errors, handleChange, validate } = useForm({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (validate()) {
-      alert("로그인 성공!");
-      navigate("/"); // 홈으로 이동
+  // 입력값 변경 핸들러
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 간단한 클라이언트 유효성 검사
+  const validate = () => {
+    const newErrors = { email: "", password: "" };
+    if (!form.email) newErrors.email = "이메일을 입력해주세요.";
+    else if (!form.email.includes("@")) newErrors.email = "올바른 이메일 형식이 아닙니다.";
+
+    if (!form.password) newErrors.password = "비밀번호를 입력해주세요.";
+    else if (form.password.length < 6) newErrors.password = "비밀번호는 6자 이상이어야 합니다.";
+
+    setErrors(newErrors);
+    return !newErrors.email && !newErrors.password;
+  };
+
+  // 로그인 요청
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    setLoading(true);
+    try {
+      const data = await api("/v1/auth/signin", {
+        method: "POST",
+        body: {
+          email: form.email,
+          password: form.password,
+        },
+      });
+
+      console.log("✅ 로그인 응답:", data);
+
+      const { accessToken, refreshToken, name } = data.data;
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        alert(`${name}님, 로그인 성공!`);
+        navigate("/");
+      }
+
+    } catch (err: any) {
+      alert(`로그인 실패: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isValid = values.email && values.password && Object.keys(errors).length === 0;
-
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-6 bg-gray-50">
-      {/* 뒤로가기 버튼 */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute top-6 left-6 text-2xl text-gray-600 hover:text-black"
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 bg-white p-6 rounded-lg shadow-md w-[320px]"
       >
-        ←
-      </button>
+        <h1 className="text-xl font-bold text-center mb-2">로그인</h1>
 
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">로그인</h1>
-
-      <div className="flex flex-col gap-3">
-        {/* 이메일 입력 */}
         <input
           name="email"
-          value={values.email}
-          onChange={handleChange}
           type="email"
+          value={form.email}
+          onChange={handleChange}
           placeholder="이메일"
-          className={`border w-[300px] p-[10px] rounded-sm focus:border-[#807bff] ${
-            errors.email ? "border-red-500" : "border-[#ccc]"
+          className={`border p-2 rounded-md focus:outline-none focus:ring-2 ${
+            errors.email ? "border-red-500 ring-red-300" : "border-gray-300 focus:ring-blue-400"
           }`}
         />
-        {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
+        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
-        {/* 비밀번호 입력 */}
         <input
           name="password"
-          value={values.password}
-          onChange={handleChange}
           type="password"
+          value={form.password}
+          onChange={handleChange}
           placeholder="비밀번호"
-          className={`border w-[300px] p-[10px] rounded-sm focus:border-[#807bff] ${
-            errors.password ? "border-red-500" : "border-[#ccc]"
+          className={`border p-2 rounded-md focus:outline-none focus:ring-2 ${
+            errors.password ? "border-red-500 ring-red-300" : "border-gray-300 focus:ring-blue-400"
           }`}
         />
-        {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
+        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
 
-        {/* 로그인 버튼 */}
         <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={!isValid}
-          className={`w-full p-2 rounded-md text-white font-semibold transition ${
-            isValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+          type="submit"
+          disabled={loading}
+          className={`w-full py-2 rounded-md text-white font-semibold transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
           }`}
         >
-          로그인
+          {loading ? "로그인 중..." : "로그인"}
         </button>
-      </div>
+
+        <p className="text-sm text-center text-gray-600 mt-2">
+          계정이 없으신가요?{" "}
+          <button
+            type="button"
+            onClick={() => navigate("/signup")}
+            className="text-blue-500 hover:underline"
+          >
+            회원가입
+          </button>
+        </p>
+      </form>
     </div>
   );
-};
-
-export default Loginpage;
+}
