@@ -2,26 +2,26 @@ import { RequestSigninDto, RequestSignupDto, ResponseSigninDto, ResponseSignupDt
 import { axiosInstance } from "./axios";
 
 export  const postSignup = async(body: RequestSignupDto):Promise<ResponseSignupDto> => {
-    const { data } = await axiosInstance.post(
+    const { data:responseData } = await axiosInstance.post(
         "/v1/auth/signup", 
         body
     )
-    return data;
+    return responseData;
 }
 
 export  const postSignin = async(body: RequestSigninDto):Promise<ResponseSigninDto> => {
-    const { data } = await axiosInstance.post(
+    const { data:responseData } = await axiosInstance.post(
         "/v1/auth/signin", 
         body
     )
-    return data;
+    return responseData;
 }
 
 export const getMyInfo = async():Promise<ResponseMyInfoDto> => {
-    const { data } = await axiosInstance.get(
+    const { data:responseData } = await axiosInstance.get(
         "/v1/users/me"
     )
-    return data;
+    return responseData;
 }
 
 export const postLogout = async() => {
