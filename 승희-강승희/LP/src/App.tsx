@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router-dom'
 import './App.css'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -6,12 +6,15 @@ import SignupPage from './pages/SignupPage'
 import NotFoundPage from './pages/NotFoundPage'
 import MyPage from './pages/MyPage'
 import HomeLayout from './layouts/HomeLayout'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedLayout from './layouts/ProtectedLayout'
 
 // 1. 홈페이지
 // 2. 로그인 페이지
 // 3. 회원가입 페이지
 
-const router = createBrowserRouter([
+// publicRoutes : 인증없이 접근 가능한 라우트
+const publicRoutes: RouteObject[] = [
   {
     path: "/",
     element: <HomeLayout />,
@@ -20,14 +23,32 @@ const router = createBrowserRouter([
       { index:true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage />},
-      { path: "my", element: <MyPage />},
     ]
   }
-])
+]
+
+// protectedRoutes : 인증이 필요한 라우트
+const protectedRoutes: RouteObject[] = [
+  {
+    path: "/",
+    element: <ProtectedLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+     {
+      path: "my",
+      element: <MyPage />
+     }
+    ]
+  }
+]
+
+const router = createBrowserRouter([...publicRoutes, ...protectedRoutes]);
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
 
