@@ -1,0 +1,58 @@
+/* 전체 헤더 영역 */
+.header-bar {
+  width: 100%;
+  background: #111;
+  padding: 14px 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* 내부 정렬 (가운데 정렬 + 양쪽 정렬) */
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+/* 로고 */
+.header-logo {
+  font-size: 24px;
+  color: #ff2a86;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* 우측 버튼 영역 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 버튼 공통 스타일 */
+.header-btn {
+  padding: 6px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 로그인 버튼 (검정 배경) */
+.login-btn {
+  background: #000;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+/* 회원가입 버튼 (핑크색) */
+.signup-btn {
+  background: #ff2a86;
+  color: #fff;
+  border: none;
+}
