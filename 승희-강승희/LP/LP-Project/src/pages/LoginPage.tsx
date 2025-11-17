@@ -24,7 +24,9 @@ const LoginPage = () => {
     })
 
     const handleSubmit = async() => {
-        await login(values);
+        await login(values, () => {
+            navigate('/my', { replace: true });
+        });
     }
 
     const handleGoogleLogin = () => {
