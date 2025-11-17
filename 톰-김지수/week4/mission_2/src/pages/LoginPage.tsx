@@ -1,4 +1,7 @@
 // src/pages/LoginPage.tsx
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 import type { LoginValues, LoginErrors } from "../hooks/useForm";
 import { useForm } from "../hooks/useForm";
 import "./LoginPage.css";
@@ -27,20 +30,28 @@ function validate(values: LoginValues): LoginErrors {
 }
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth(); // 🔑 AuthContext에서 로그인 함수 가져오기
 
   const { values, errors, isValid, handleChange, handleSubmit } = useForm({
     initialValues: { email: "", password: "" },
     validate,
-    onSubmit: (v) => {
-      // 실제 로그인 요청 대신 콘솔로만
+    onSubmit: (v: LoginValues) => {
+      // 실제로는 여기서 API 호출 + 토큰 저장할 자리
       console.log("로그인 시도", v);
-      alert("로그인 성공 가정 ✨");
+
+      // 🔐 로그인 상태 true로 변경
+      login();
+
+      // 🧭 로그인 후 이동할 페이지
+      //  - 홈으로 보내고 싶으면 "/"
+      //  - 방금 말한 프리미엄 페이지 테스트하려면 "/premium/webtoon/1"
+      navigate("/");
     },
   });
 
   return (
     <div className="login-page">
-
       <main className="login-main">
         <div className="login-card">
           <button className="google-button">구글 로그인</button>

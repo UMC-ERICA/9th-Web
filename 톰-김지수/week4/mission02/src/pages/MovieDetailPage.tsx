@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom"
 import axios from "axios"
 import Spinner from "../components/Spinner"
 
-const TMDB_TOKEN = import.meta.env.VITE_TMDB_KEY as string | undefined
+// 🔑 TMDB v3 API 키
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_KEY as string | undefined
 
 const API_BASE = "https://api.themoviedb.org/3"
 const TMDB_LANG = "ko-KR"
@@ -33,8 +34,9 @@ export default function MovieDetailPage() {
 
   useEffect(() => {
     if (!movieId) return
-    if (!TMDB_TOKEN) {
-      setError(" TMDB 토큰이 없습니다. .env에 VITE_TMDB_KEY를 추가하세요.")
+
+    if (!TMDB_API_KEY) {
+      setError("TMDB 키가 없습니다. .env에 VITE_TMDB_KEY를 추가하세요.")
       setIsLoading(false)
       return
     }
@@ -44,15 +46,19 @@ export default function MovieDetailPage() {
         setIsLoading(true)
         setError(null)
 
-        //  동시에 두 API 요청 (상세 + 출연진)
+        // 🎬 영화 상세 + 크레딧을 동시에 요청
         const [movieRes, creditsRes] = await Promise.all([
           axios.get(`${API_BASE}/movie/${movieId}`, {
-            params: { language: TMDB_LANG },
-            headers: { Authorization: `Bearer ${TMDB_TOKEN}` },
+            params: {
+              api_key: TMDB_API_KEY, // 🔥 v3 인증
+              language: TMDB_LANG,
+            },
           }),
           axios.get(`${API_BASE}/movie/${movieId}/credits`, {
-            params: { language: TMDB_LANG },
-            headers: { Authorization: `Bearer ${TMDB_TOKEN}` },
+            params: {
+              api_key: TMDB_API_KEY, // 🔥 v3 인증
+              language: TMDB_LANG,
+            },
           }),
         ])
 
@@ -91,7 +97,7 @@ export default function MovieDetailPage() {
 
   return (
     <section className="mx-auto max-w-3xl p-4">
-      {/*  영화 기본 정보 */}
+      {/* 영화 기본 정보 */}
       <div className="flex flex-col gap-6 sm:flex-row">
         <img
           src={
@@ -115,7 +121,7 @@ export default function MovieDetailPage() {
         </div>
       </div>
 
-      {/*  출연진 섹션 */}
+      {/* 출연진 섹션 */}
       <h2 className="mt-10 mb-4 text-2xl font-semibold">출연진</h2>
       <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5">
         {credits?.cast.slice(0, 10).map((actor) => (
