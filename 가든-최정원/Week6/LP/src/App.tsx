@@ -7,7 +7,7 @@ import LpsListPage from "./pages/LpsListPage";
 import LpDetailPage from "./pages/LpDetailPage";
 import UploadPage from "./pages/UploadPage";
 
-import Loginpage from "./pages/Loginpage";
+import Loginpage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import MyPage from "./pages/MyPage";
 import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
