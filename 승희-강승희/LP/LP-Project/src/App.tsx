@@ -11,6 +11,7 @@ import ProtectedLayout from './layouts/ProtectedLayout'
 import GoogleLoginRedirectPage from './pages/GoogleLoginRedirectPage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import LpDetailPage from './pages/LpDetailPage'
 
 // 1. 홈페이지
 // 2. 로그인 페이지
@@ -26,7 +27,8 @@ const publicRoutes: RouteObject[] = [
       { index:true, element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "signup", element: <SignupPage />},
-      {path: "v1/auth/google/callback", element:<GoogleLoginRedirectPage /> }
+      {path: "v1/auth/google/callback", element:<GoogleLoginRedirectPage /> },
+      {path: 'lps/:lpId', element:<LpDetailPage />}
     ]
   }
 ]
@@ -48,17 +50,11 @@ const protectedRoutes: RouteObject[] = [
 
 const router = createBrowserRouter([...publicRoutes, ...protectedRoutes]);
 
-export const queryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-    }
-  }
-});
+export const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient()}>
+    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router = {router} />
       </AuthProvider>

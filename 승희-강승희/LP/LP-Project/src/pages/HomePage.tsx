@@ -22,8 +22,8 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    if(inView){
-      !isFetching && hasNextPage && fetchNextPage();
+    if(inView && !isFetching && hasNextPage){
+       fetchNextPage();
     }
   }, [inView, isFetching, hasNextPage, fetchNextPage]);
 
