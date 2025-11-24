@@ -1,39 +1,42 @@
 // src/components/comments/CommentInput.tsx
 import { useState } from "react";
 
-export default function CommentInput() {
+interface Props {
+  onSubmit: (value: string) => void;
+  isLoading: boolean;
+}
+
+export default function CommentInput({ onSubmit, isLoading }: Props) {
   const [value, setValue] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!value.trim()) {
+  const handleSubmit = () => {
+    const trimmed = value.trim();
+    if (!trimmed) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
-    alert("댓글 작성 API는 아직 미구현 상태입니다. (UI만 구현)");
+    onSubmit(trimmed);
     setValue("");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border rounded p-3 space-y-2">
+    <div className="mt-3 border rounded p-3 text-sm bg-white">
       <textarea
-        className="w-full border rounded p-2 text-sm resize-none h-20 focus:outline-none focus:ring-1 focus:ring-blue-400"
-        placeholder="댓글을 입력해주세요. (엔터만 눌러도 안 올라가고, 버튼으로 전송된다고 가정)"
+        className="w-full border rounded p-2 text-sm min-h-[60px] mb-2"
+        placeholder="댓글을 입력해보세요."
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
       <div className="flex justify-end">
         <button
-          type="submit"
-          className="px-4 py-1.5 rounded bg-blue-600 text-white text-sm disabled:bg-gray-400"
-          disabled={!value.trim()}
+          type="button"
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="px-4 py-1 rounded bg-blue-600 text-white text-xs disabled:bg-gray-400"
         >
-          댓글 작성
+          {isLoading ? "작성 중..." : "댓글 작성"}
         </button>
       </div>
-      <p className="text-xs text-gray-400">
-        ※ 과제 요구사항에 따라 UI만 구현된 상태입니다.
-      </p>
-    </form>
+    </div>
   );
 }

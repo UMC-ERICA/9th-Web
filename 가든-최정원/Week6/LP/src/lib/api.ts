@@ -1,37 +1,55 @@
 // src/lib/api.ts
-import axios from "../apis/axios";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-export async function api(
-  path: string,
-  options: {
-    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-    body?: unknown;
-    headers?: Record<string, string>;
-  } = {}
-) {
-  const { method = "GET", body, headers = {} } = options;
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-  const config: any = {
-    url: path,
-    method,
-    headers,
-  };
-
-  if (body && method !== "GET") {
-    config.data = body;
-  }
-
-  console.log("api.ts ▶️ 요청 URL:", `http://localhost:8000${path}`);
-  if (body) console.log("api.ts 📦 요청 Body:", body);
-
-  try {
-    const res = await axios(config);
-    return res.data;
-  } catch (error: any) {
-    console.error("❌ API 요청 실패:", error);
-    throw error;
-  }
+interface ApiOptions {
+  method?: HttpMethod;
+  body?: unknown;
+  headers?: Record<string, string>;
+  withAuth?: boolean;
 }
 
-// ⬇⬇⬇ 이게 중요!!! ⬇⬇⬇
-export default api;
+export async function api(path: string, options: ApiOptions = {}) {
+  const {
+    method = "GET",
+    body,
+    headers: customHeaders = {},
+    withAuth = true,
+  } = options;
+
+  const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
+
+  const headers: Record<string, string> = { ...customHeaders };
+
+  // FormData가 아닌 경우에만 JSON 헤더 설정
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (withAuth) {
+    const token =
+      localStorage.getItem("accessToken") || localStorage.getItem("token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: body
+      ? (isFormData ? (body as BodyInit) : JSON.stringify(body))
+      : undefined,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    const msg = data?.message || data?.error || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+
+  return data;
+}

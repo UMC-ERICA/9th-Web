@@ -1,56 +1,199 @@
 // src/pages/MyPage.tsx
-import { useEffect, useState } from "react";
-import { api } from "../lib/api";
-import { useNavigate } from "react-router-dom";
-
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-}
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getMe, updateMe, type Me } from "../apis/userApi";
 
 export default function MyPage() {
-  const [user, setUser] = useState<UserData | null>(null);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [editOpen, setEditOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState("");
 
-  useEffect(() => {
-    api("/v1/users/me", { method: "GET" })
-      .then((res) => {
-        const data = (res as any).data ?? res;
-        setUser(data);
-        if (data?.name) localStorage.setItem("userName", data.name);
-      })
-      .catch((err) => setError(err.message));
-  }, []);
+  const { data: me, isLoading, isError } = useQuery<Me>({
+    queryKey: ["me"],
+    queryFn: getMe,
+  });
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userName");
-    alert("로그아웃 되었습니다.");
-    navigate("/login");
+  const updateMutation = useMutation({
+    mutationFn: (input: {
+      name?: string;
+      bio?: string;
+      profileImageUrl?: string;
+    }) => updateMe(input),
+    // 🔵 Optimistic Update
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: ["me"] });
+
+      const prevMe = queryClient.getQueryData<Me>(["me"]);
+
+      if (prevMe) {
+        const nextMe: Me = {
+          ...prevMe,
+          name: input.name ?? prevMe.name,
+          bio:
+            input.bio !== undefined
+              ? input.bio
+              : prevMe.bio,
+          profileImageUrl:
+            input.profileImageUrl !== undefined
+              ? input.profileImageUrl
+              : prevMe.profileImageUrl,
+        };
+        queryClient.setQueryData(["me"], nextMe);
+      }
+
+      if (input.name) {
+        localStorage.setItem("userName", input.name);
+      }
+
+      return { prevMe };
+    },
+    onError: (error: any, _input, context) => {
+      if (context?.prevMe) {
+        queryClient.setQueryData(["me"], context.prevMe);
+      }
+      alert(`프로필 수정 실패: ${error?.message ?? "오류"}`);
+    },
+    onSuccess: () => {
+      alert("프로필이 수정되었습니다.");
+      setEditOpen(false);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
+  });
+
+  const handleOpenEdit = () => {
+    if (!me) return;
+    setName(me.name ?? "");
+    setBio(me.bio ?? "");
+    setProfileImageUrl(me.profileImageUrl ?? "");
+    setEditOpen(true);
   };
 
+  const handleSave = () => {
+    updateMutation.mutate({
+      name: name || undefined,
+      bio: bio || undefined,
+      profileImageUrl: profileImageUrl || undefined,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="p-4">
+        <p>내 정보 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (isError || !me) {
+    return (
+      <div className="p-4">
+        <p>내 정보를 불러오지 못했습니다.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-bold">🔒 마이페이지</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      {user ? (
-        <div className="border rounded p-6 w-[320px] text-center bg-white">
-          <p className="mb-2">안녕하세요,</p>
-          <p className="text-xl font-semibold">{user.name}님 👋</p>
-          <p className="text-sm text-gray-600 mt-1">{user.email}</p>
-          <button
-            onClick={handleLogout}
-            className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
-          >
-            로그아웃
-          </button>
+    <div className="p-4 max-w-xl mx-auto">
+      <div className="flex items-center gap-4 mb-4">
+        {me.profileImageUrl ? (
+          <img
+            src={me.profileImageUrl}
+            alt="profile"
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-sm">
+            No Image
+          </div>
+        )}
+        <div>
+          <h2 className="text-xl font-semibold">{me.name}</h2>
+          <p className="text-gray-500 text-sm">{me.email}</p>
         </div>
-      ) : (
-        <p>유저 정보를 불러오는 중...</p>
+      </div>
+
+      <div className="mb-4">
+        <h3 className="font-semibold mb-1">Bio</h3>
+        <p className="text-sm text-gray-700 whitespace-pre-wrap">
+          {me.bio || "소개가 없습니다."}
+        </p>
+      </div>
+
+      <button
+        onClick={handleOpenEdit}
+        className="px-4 py-2 rounded bg-gray-800 text-white text-sm"
+      >
+        설정
+      </button>
+
+      {/* 설정 모달 */}
+      {editOpen && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
+          onClick={() => setEditOpen(false)}
+        >
+          <div
+            className="bg-white rounded-md p-6 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">프로필 수정</h2>
+              <button onClick={() => setEditOpen(false)}>X</button>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div>
+                <label className="block mb-1 font-medium">이름</label>
+                <input
+                  className="w-full border rounded px-2 py-1"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">Bio (선택)</label>
+                <textarea
+                  className="w-full border rounded px-2 py-1 min-h-[80px]"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 font-medium">
+                  프로필 이미지 URL (선택)
+                </label>
+                <input
+                  className="w-full border rounded px-2 py-1"
+                  value={profileImageUrl}
+                  onChange={(e) => setProfileImageUrl(e.target.value)}
+                  placeholder="https://example.com/profile.png"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => setEditOpen(false)}
+                  className="px-4 py-2 rounded bg-gray-200 text-sm"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={updateMutation.isPending}
+                  className="px-4 py-2 rounded bg-blue-600 text-white text-sm disabled:bg-gray-400"
+                >
+                  {updateMutation.isPending ? "저장 중..." : "저장"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
