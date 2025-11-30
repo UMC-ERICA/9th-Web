@@ -63,21 +63,23 @@ export default function LpDetailPage() {
     setLikeCount(baseCount || 0);
   }, [lp?.id]);
 
-  const likeMutation = useMutation({
-    mutationFn: (nextLiked: boolean) => toggleLpLike(id, nextLiked),
-    onError: (err: any, nextLiked) => {
-      alert(`좋아요 처리 실패: ${err?.message ?? "오류"}`);
-      // 롤백
-      setLiked((prev) => !nextLiked);
-      setLikeCount((prev) =>
-        Math.max(0, prev + (nextLiked ? -1 : 1))
-      );
-    },
-    onSettled: () => {
-      // 서버 값과 최종 동기화하고 싶다면 (선택)
-      queryClient.invalidateQueries({ queryKey: ["lp", id] });
-    },
-  });
+ const likeMutation = useMutation({
+  // nextLiked는 onError에서 쓰려고 그대로 받기만 하고,
+  // API 호출에는 사용하지 않음
+  mutationFn: (nextLiked: boolean) => toggleLpLike(id),
+  onError: (err: any, nextLiked) => {
+    alert(`좋아요 처리 실패: ${err?.message ?? "오류"}`);
+    // 롤백
+    setLiked((prev) => !nextLiked);
+    setLikeCount((prev) =>
+      Math.max(0, prev + (nextLiked ? -1 : 1))
+    );
+  },
+  onSettled: () => {
+    queryClient.invalidateQueries({ queryKey: ["lp", id] });
+  },
+});
+
 
   const handleToggleLike = () => {
     const nextLiked = !liked;
