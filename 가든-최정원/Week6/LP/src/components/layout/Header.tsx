@@ -1,30 +1,52 @@
 // src/components/layout/Header.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getMe, type Me } from "../../apis/userApi";
 
 export default function Header() {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const queryClient = useQueryClient();
+  const [hasToken, setHasToken] = useState<boolean>(() => {
+    const token =
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token");
+    return !!token;
+  });
 
+  // 토큰 존재할 때만 me 조회
+  const { data: me } = useQuery<Me>({
+    queryKey: ["me"],
+    queryFn: getMe,
+    enabled: hasToken,
+  });
+
+  // 토큰 변화 감지 (초기 한 번)
   useEffect(() => {
     const token =
-      localStorage.getItem("accessToken") || localStorage.getItem("token");
-    const name = localStorage.getItem("userName");
-    setIsLoggedIn(!!token);
-    setUserName(name);
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token");
+    setHasToken(!!token);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userName");
-    alert("로그아웃 되었습니다.");
-    setIsLoggedIn(false);
-    setUserName(null);
-    navigate("/login");
-  };
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+    },
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: ["me"] });
+      setHasToken(false);
+      alert("로그아웃 되었습니다.");
+      navigate("/login");
+    },
+  });
+
+  const isLoggedIn = hasToken;
+  const userName =
+    me?.name ?? localStorage.getItem("userName") ?? "사용자";
 
   return (
     <header className="w-full flex items-center justify-between px-4 py-3 border-b bg-white">
@@ -36,7 +58,7 @@ export default function Header() {
         {isLoggedIn ? (
           <>
             <span className="hidden sm:inline">
-              {userName ?? "사용자"}님 반갑습니다 👋
+              {userName}님 반갑습니다 👋
             </span>
             <button
               onClick={() => navigate("/mypage")}
@@ -45,7 +67,7 @@ export default function Header() {
               마이페이지
             </button>
             <button
-              onClick={handleLogout}
+              onClick={() => logoutMutation.mutate()}
               className="px-3 py-1 rounded bg-red-500 text-white"
             >
               로그아웃

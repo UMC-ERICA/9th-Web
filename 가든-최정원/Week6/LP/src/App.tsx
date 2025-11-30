@@ -1,59 +1,42 @@
-// src/App.tsx
-import { Routes, Route } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/Homepage";
-import LpsListPage from "./pages/LpsListPage";
-import LpDetailPage from "./pages/LpDetailPage";
-import UploadPage from "./pages/UploadPage";
-
-import Loginpage from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import MyPage from "./pages/MyPage";
-import GoogleLoginRedirectPage from "./pages/GoogleLoginRedirectPage";
+import LpListPage from "./pages/LpsListPage";
+import LpDetailPage from "./pages/LpDetailPage";
+import UploadPage from "./pages/UploadPage";   // 🔵 업로드 페이지
+import Mypage from "./pages/MyPage";
 import NotFoundPage from "./pages/NotFoundPage";
-
-import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   return (
-    <Routes>
-      {/* 헤더/사이드바/플로팅 버튼이 있는 공통 레이아웃 */}
-      <Route element={<Layout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/lps" element={<LpsListPage />} />
-        <Route
-          path="/lp/:lpId"
-          element={
-            <ProtectedRoute>
-              <LpDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute>
-              <UploadPage />
-            </ProtectedRoute>
-          }
-        />
-      </Route>
+    <BrowserRouter>
+      <Routes>
+        {/* layout 있는 페이지 */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
 
-      {/* 인증 관련 페이지 (레이아웃 바깥) */}
-      <Route path="/login" element={<Loginpage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/google" element={<GoogleLoginRedirectPage />} />
-      <Route
-        path="/mypage"
-        element={
-          <ProtectedRoute>
-            <MyPage />
-          </ProtectedRoute>
-        }
-      />
+          {/* 🔵 LP 목록 */}
+          <Route path="/lps" element={<LpListPage />} />
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+          {/* 🔵 LP 상세 */}
+          <Route path="/lps/:lpId" element={<LpDetailPage />} />
+
+          {/* 🔵 LP 업로드 */}
+          <Route path="/upload" element={<UploadPage />} />
+
+          {/* My 페이지 */}
+          <Route path="/mypage" element={<Mypage />} />
+        </Route>
+
+        {/* 인증 */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+
+        {/* Not Found */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

@@ -63,7 +63,6 @@ export default function LpsListPage() {
         </button>
       </div>
 
-      {/* 목록 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {list.map((lp) => (
           <LpCard key={lp.id} lp={lp} />
