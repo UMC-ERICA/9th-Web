@@ -1,17 +1,25 @@
 import { Link } from "react-router"
 import { useAuth } from "../context/AuthContext"
+import { HamburgerButton } from "./HamburgerButton";
+import { useSidebar } from "../hooks/useSidebar";
+import { Sidebar } from "./Sidebar";
 
 const Navbar = () => {
     const {accessToken} = useAuth();
+    const {isOpen, toggle, close} = useSidebar();
 
     return <nav className="bg-white dark:bg-gray-900 shadow-md fixed w-full z-10">
-        <div className="flex items-center justify-between p-4">
-            <Link 
-            to ='/' 
-            className="text-xl font-bold text-gray-900 dark:text-white"
-            >
-            SpinningSpinning Dolimpan
-            </Link>
+        
+        <div className="flex items-center justify-between p-4 w-full">
+            <div className="flex items-center gap-4">
+                <HamburgerButton isOpen={isOpen} onClick={toggle} />
+                <Link 
+                to ='/' 
+                className="text-xl font-bold text-gray-900 dark:text-white"
+                >
+                돌려돌려 LP판
+                </Link>
+            </div>
             <div className="space-x-6">
                 {!accessToken && (
                 <>
@@ -44,7 +52,7 @@ const Navbar = () => {
                 검색
             </Link>
             </div>
-            
+            <Sidebar isOpen={isOpen} onClose={close} />
         </div>
     </nav>
 }
