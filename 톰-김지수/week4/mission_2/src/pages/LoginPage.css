@@ -1,0 +1,138 @@
+/* 전체 화면: 검은 배경 + 가운데 정렬 */
+.login-page {
+  min-height: 100vh;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 안쪽 로그인 영역(헤더 + 카드)을 가운데로 모으기 */
+.login-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 상단 "< 로그인" 부분 */
+.login-header {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding-top: 80px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.back-button {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.login-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* 가운데 카드 박스 */
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 24px 20px 28px;
+  border-radius: 8px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* 구글 로그인 버튼 */
+.google-button {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* OR 구분선 */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 20px;
+}
+
+.divider .line {
+  flex: 1;
+  height: 1px;
+  background: #666666;
+}
+
+.divider .or {
+  font-size: 12px;
+  color: #b3b3b3;
+}
+
+/* 폼 전체 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 입력 필드 */
+.field input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.field input::placeholder {
+  color: #a0a0a0;
+  font-size: 13px;
+}
+
+/* 에러 메시지 */
+.error-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #ff6b6b;
+}
+
+/* 로그인 버튼 (핑크) */
+.login-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+  border-radius: 4px;
+  border: none;
+  background: #ff2a86;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.login-button:disabled {
+  background: #555555;
+  cursor: not-allowed;
+}

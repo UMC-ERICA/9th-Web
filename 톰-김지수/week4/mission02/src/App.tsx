@@ -3,6 +3,7 @@ import Layout from "./components/Layout"
 import HomePage from "./pages/HomePage"
 import MoviePage from "./pages/MoviePage"
 import MovieDetailPage from "./pages/MovieDetailPage"
+import LoginPage from "./pages/LoginPage"   
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/top-rated" element={<MoviePage type="top_rated" />} />
         <Route path="/now-playing" element={<MoviePage type="now_playing" />} />
         <Route path="/movie/:movieId" element={<MovieDetailPage />} />
+        <Route path="/login" element={<LoginPage />} /> 
       </Route>
     </Routes>
   )
