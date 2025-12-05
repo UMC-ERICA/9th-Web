@@ -8,10 +8,11 @@ export interface Lp {
   thumbnail: string;
   createdAt: string;
   tags?: string[];
-  likes?: any[]; // 서버 구조에 따라 배열일 수도 있음
-  // 상세에서 쓸 수도 있는 필드들(있으면 사용, 없으면 기본값)
-  likesCount?: number;
-  likedByMe?: boolean;
+  likes?: any[];
+  // 백엔드에서 내려주면 사용, 없으면 undefined
+  isMine?: boolean;
+  likeCount?: number;
+  isLiked?: boolean;
 }
 
 export interface LpPage {
@@ -20,15 +21,24 @@ export interface LpPage {
   hasNext: boolean;
 }
 
-// 무한스크롤용 목록
+// 무한스크롤 + 검색용 LP 목록
 export async function getLpsPage(
   sort: "latest" | "oldest",
-  cursor?: number
+  cursor?: number,
+  search?: string
 ): Promise<LpPage> {
   const params = new URLSearchParams();
   params.set("sort", sort);
+
   if (cursor !== undefined && cursor !== null) {
     params.set("cursor", String(cursor));
+  }
+
+  const trimmed = search?.trim();
+  if (trimmed) {
+    // 백엔드에서 어떤 이름을 쓰든, 보통 search/query/keyword 중 하나인데
+    // 여기서는 search 라는 쿼리 파라미터로 보냄.
+    params.set("search", trimmed);
   }
 
   const res = await api(`/v1/lps?${params.toString()}`, {
@@ -47,7 +57,7 @@ export async function getLpsPage(
   };
 }
 
-// LP 생성 (파일 + 태그)
+// LP 생성 (이미 구현되어 있던 형태 유지)
 export async function createLp(input: {
   title: string;
   content: string;
@@ -60,7 +70,6 @@ export async function createLp(input: {
   formData.append("tags", JSON.stringify(input.tags));
 
   if (input.file) {
-    // 서버에서 기대하는 필드명에 맞게
     formData.append("thumbnail", input.file);
   }
 
@@ -89,16 +98,11 @@ export async function deleteLp(lpId: number) {
   });
 }
 
-// 좋아요 토글용 API (true = 좋아요, false = 취소)
-export async function toggleLpLike(lpId: number, like: boolean) {
-  if (like) {
-    // 좋아요
-    return api(`/v1/lps/${lpId}/likes`, {
-      method: "POST",
-    });
-  }
-  // 좋아요 취소
+// 좋아요 토글 (이미 구현돼 있다면 이 형태와 크게 다르지 않을 것)
+export async function toggleLpLike(lpId: number) {
+  // 서버가 같은 URL로 "좋아요" / "좋아요 취소" 모두 처리한다고 했으니
+  // 프론트는 단순 POST 한 번만 날리면 됨.
   return api(`/v1/lps/${lpId}/likes`, {
-    method: "DELETE",
+    method: "POST",
   });
 }

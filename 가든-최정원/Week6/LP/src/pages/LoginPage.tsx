@@ -4,6 +4,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../lib/api";
 
+interface LoginResponse {
+  id: number;
+  name: string;
+  accessToken: string;
+  refreshToken?: string;
+}
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,33 +24,35 @@ export default function LoginPage() {
         method: "POST",
         body: payload,
       });
-      return (res as any).data; // ← data 안에 id, name, token 들어있음
+      const data = (res as any).data ?? res;
+      return data as LoginResponse;
     },
-
     onSuccess: (data) => {
-      if (!data) return;
+      const { id, name, accessToken, refreshToken } = data ?? {};
 
-      // 백엔드 응답 구조에 맞춤
-      const { id, name, accessToken, refreshToken } = data;
+      // ✅ userId / userName 저장 → 댓글 isMine 판단에 사용
+      if (id != null) {
+        localStorage.setItem("userId", String(id));
+      }
+      if (name) {
+        localStorage.setItem("userName", name);
+      }
 
-      // user 정보 저장
-      localStorage.setItem("userId", String(id));
-      localStorage.setItem("userName", name);
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
 
-      // access / refresh token 저장
-      if (accessToken) localStorage.setItem("accessToken", accessToken);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-
-      alert(`${name}님, 로그인 성공!`);
+      alert(`${name ?? "사용자"}님, 로그인 성공!`);
 
       const from =
         (location.state as any)?.from?.pathname ??
         (location.state as any)?.from ??
         "/";
-
       navigate(from, { replace: true });
     },
-
     onError: (err: any) => {
       alert(`로그인 실패: ${err?.message ?? "오류가 발생했습니다."}`);
     },
@@ -76,7 +85,9 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_SERVER_API_URL}/v1/auth/google/login`;
+    window.location.href = `${
+      import.meta.env.VITE_SERVER_API_URL
+    }/v1/auth/google/login`;
   };
 
   return (
@@ -137,7 +148,7 @@ export default function LoginPage() {
         </p>
       </form>
 
-      {/* 구글 로그인 버튼 — 여기 유지됨 */}
+      {/* ✅ 구글 로그인 버튼 유지 */}
       <button
         onClick={handleGoogleLogin}
         className="mt-4 flex items-center gap-2 border px-4 py-2 rounded"
