@@ -1,5 +1,5 @@
 import { RequestSigninDto, RequestSignupDto, ResponseSigninDto, ResponseSignupDto, ResponseMyInfoDto } from "../types/auth";
-import { axiosInstance } from "./axios";
+import {axiosInstance} from "./axios";
 
 export  const postSignup = async(body: RequestSignupDto):Promise<ResponseSignupDto> => {
     const { data:responseData } = await axiosInstance.post(
