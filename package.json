@@ -14,8 +14,10 @@
     "vite": "^7.1.12"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/postcss": "^4.1.16",
     "@tailwindcss/vite": "^4.1.15",
+    "react-redux": "^9.2.0",
     "tailwindcss": "^4.1.16"
   },
   "scripts": {
