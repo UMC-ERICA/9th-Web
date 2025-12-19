@@ -1,21 +1,20 @@
+import { useCartActions } from "../hooks/useCartStore";
 import { useModalStore } from "../hooks/useModalStore";
-import { useDispatch } from "../hooks/useCustomRedux";
-import { clearCart } from "../slices/cartSlice";
 
 const ConfirmModal = () => {
-  const { isOpen, closeModal } = useModalStore();
-  const dispatch = useDispatch();
+  const isOpen = useModalStore((state) => state.isOpen);
+  const closeModal = useModalStore((state) => state.closeModal);
+  const { clearCart } = useCartActions();
 
-  // [ ] useState 사용 없이 전역 상태 isOpen으로 제어
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    dispatch(clearCart()); // 장바구니 초기화 (dispatch 실행)
-    closeModal(); // 모달 닫기 (dispatch 실행)
+    clearCart();
+    closeModal();
   };
 
   const handleCancel = () => {
-    closeModal(); // 모달 닫기 (dispatch 실행)
+    closeModal();
   };
 
   return (
