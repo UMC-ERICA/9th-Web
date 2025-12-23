@@ -1,18 +1,19 @@
 export type MovieLanguage = "ko-KR" | "en-US" | "ja-JP";
 
-export type MovieFilters = {
+
+export type MovieFilters={
     query: string;
-    include_adult: boolean;
+    include_adult:boolean;
     language: MovieLanguage;
 };
 
-export type Movie = {
+export type Movie ={
     adult: boolean;
-    backdrop_path: string | null;
+    backdrop_path: string;
     genre_ids: number[];
     id: number;
-    original_language: string;
-    original_title: string;
+    original_language:string ;
+    original_title:string ;
     overview: string;
     popularity: number;
     poster_path: string;
@@ -28,4 +29,4 @@ export type MovieResponse = {
     results: Movie[];
     total_pages: number;
     total_results: number;
-};
+}

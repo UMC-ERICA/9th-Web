@@ -11,12 +11,16 @@ const useFetch = <T>(url: string, options: AxiosRequestConfig = {}) => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
+                console.log('API 요청 URL:', url);
+                console.log('API 요청 옵션:', options);
                 const {data} = await axiosClient.get(url, {
                     ...options,
                 });
+                console.log('API 응답:', data);
                 setData(data);
-            } catch {
-                setError(new Error("데이터를 가져오는데 에러가 발생했습니다."));
+            } catch(error){
+                console.error('API 에러:', error);
+                setError(Error("데이터를 가져오는데 에러가 발생했습니다."));
             } finally {
                 setIsLoading(false);
             }
