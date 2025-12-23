@@ -22,7 +22,7 @@ export default function Homepage() {
     const { data, error, isLoading } = useFetch<MovieResponse>('/search/movie', axiosRequestConfig);
 
     if (error) {
-        return <div>{error}</div>;
+        return <div>{error.message}</div>;
     }
 
     return (
